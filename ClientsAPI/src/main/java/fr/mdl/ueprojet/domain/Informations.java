@@ -7,10 +7,14 @@ public class Informations {
 
     private String date;
     private String message;
-    private String lieu;
+    private String location;
 
-    public String toString() {
-        return "\ndate : " + date + "\nmessage : " + message +"\nlieu : " + lieu;
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getDate() {
@@ -28,13 +32,4 @@ public class Informations {
     public void setMessage(String message) {
         this.message = message;
     }
-
-    public String getLieu() {
-        return lieu;
-    }
-
-    public void setLieu(String lieu) {
-        this.lieu = lieu;
-    }
-
 }
