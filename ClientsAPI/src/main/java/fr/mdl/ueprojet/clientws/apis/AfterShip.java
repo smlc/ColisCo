@@ -24,60 +24,64 @@ public class AfterShip implements Apis {
     private static final String VERSION = "v4";
     private static final String RESOURCE = "trackings";
     private static final String AUTH_KEY_PARAM = "aftership-api-key";
-    private static final String AUTH_KEY_VALUE = "2bee0296-f6eb-4bbd-8adb-60cf1ddc4c54";
-    //"eb591ab8-2044-45ec-91ec-530f730831cb"; k
+    private static final String AUTH_KEY_VALUE = "28682703-d99a-4680-a746-8e20709d0940";
 
     @Override
-    public List<Tracking> getTracking(Tracking tracking) {
-        System.out.println(tracking.getTrackingNumber() + " transporteur : " + tracking.getCarrier());
-        List<Tracking> listColis = new ArrayList<>();
-        Client client = ClientBuilder.newClient();
-        try {
+    public Tracking getTracking(Tracking tracking) {
+        JsonArray checkpoints = getJsonArray(tracking);
+        checkpoints = getJsonArray(tracking);
+        List<Informations> listeInformations = new ArrayList<>();
 
-            JsonObject postResult = postTracking(tracking);
-
-            JsonObject result = client.target(API_URI)
-                    .path(VERSION)
-                    .path(RESOURCE)
-                    .path(tracking.getCarrier())
-                    .path(tracking.getTrackingNumber())
-                    .request()
-                    .header(AUTH_KEY_PARAM, AUTH_KEY_VALUE)
-                    .header("Content-Type", "application/json")
-                    .get(JsonObject.class);
-            System.out.println( "Resultat" + result + "cccc");
-
-            JsonArray checkpoints = result.getJsonObject("data")
-                    .getJsonObject("tracking")
-                    .getJsonArray("checkpoints");
-
-            for (JsonValue infos : checkpoints) {
-                Informations informations = new Informations();
-                informations.setMessage(((JsonObject) infos).getString("message"));
-                informations.setDate(((JsonObject) infos).getString("checkpoint_time"));
-                informations.setLocation(((JsonObject) infos).getString("location"));
-                Tracking track = new Tracking();
-                track.setInformations(informations);
-                listColis.add(track);
+        for (JsonValue infos : checkpoints) {
+            Informations information = new Informations();
+            information.setMessage(((JsonObject) infos).getString("message"));
+            information.setDate(((JsonObject) infos).getString("checkpoint_time"));
+            if(tracking.getCarrier().equals("chronopost-france")) {
+                information.setLocation("Pas d'informations sur la localisation (non renseigné)");
+            }else {
+                information.setLocation(((JsonObject) infos).getString("location"));
             }
+            listeInformations.add(information);
+        }
+        tracking.setInformations(listeInformations);
+        return tracking;
+    }
 
-            JsonObject deleteResult = deleteTracking(tracking);
+    /**
+     * Envoie une requête GET pour récupérer les données dans un JsonArray.
+     * @param tracking le colis
+     * @return un tableau json contenant les données sous formes d'objets
+     */
+    public JsonArray getJsonArray(Tracking tracking){
+        Client client = ClientBuilder.newClient();
+        JsonArray checkpoints = null;
+        try {
+            do {
+                JsonObject result = client.target(API_URI)
+                        .path(VERSION)
+                        .path(RESOURCE)
+                        .path(tracking.getCarrier())
+                        .path(tracking.getTrackingNumber())
+                        .request()
+                        .header(AUTH_KEY_PARAM, AUTH_KEY_VALUE)
+                        .header("Content-Type", "application/json")
+                        .get(JsonObject.class);
 
-        }catch (NullPointerException e){
-            System.err.println("Réponse HTTP -- " + e.getMessage());
-        }catch (ClassCastException e){
-            System.err.println("Réponse HTTP ** " + e.getMessage());
+                checkpoints = result.getJsonObject("data")
+                        .getJsonObject("tracking")
+                        .getJsonArray("checkpoints");
+            }while (checkpoints.isEmpty());
+
         }catch (NotFoundException e){
             System.err.println("Réponse HTTP //  " + e.getMessage());
         }catch (InternalServerErrorException e) {
             System.err.println("Réponse HTTP " + e.getResponse().getStatus());
         }
-
-        return listColis;
+        return checkpoints;
     }
 
+    @Override
     public JsonObject postTracking(Tracking tracking) {
-        System.out.println("post");
         JsonObject value = Json.createObjectBuilder()
                 .add("tracking", Json.createObjectBuilder()
                         .add("tracking_number",tracking.getTrackingNumber())
@@ -95,8 +99,8 @@ public class AfterShip implements Apis {
         return result;
     }
 
+    @Override
     public JsonObject deleteTracking(Tracking tracking) {
-        System.out.println("delete");
         Client client = ClientBuilder.newClient();
         Response response = client.target(API_URI)
                 .path(VERSION)

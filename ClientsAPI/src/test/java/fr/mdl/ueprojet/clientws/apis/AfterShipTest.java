@@ -1,12 +1,19 @@
 package fr.mdl.ueprojet.clientws.apis;
 
+import fr.mdl.ueprojet.domain.Informations;
 import fr.mdl.ueprojet.domain.Tracking;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
+import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -19,33 +26,36 @@ public class AfterShipTest {
     private static AfterShip afterShip;
     private static Tracking tracking;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() throws Exception {
         afterShip = new AfterShip();
-        tracking = new Tracking("3120829169675900","tnt-fr");
+        tracking = new Tracking("8G00619019776","colissimo");
+    }
+
+    @Before
+    public void testPostTracking() throws Exception {
+        JsonObject result = afterShip.postTracking(tracking);
+        assertEquals(result.getJsonObject("meta").getInt("code"), 201);
     }
 
     @Test
     public void testGetTracking() throws Exception {
-        System.out.println("test GETTING...");
-        List<Tracking> trackings = afterShip.getTracking(tracking);
-        System.out.println(trackings.toString());
-        Assert.assertTrue(!trackings.isEmpty());
+        Tracking track = afterShip.getTracking(tracking);
+        assertTrue(!track.getInformations().isEmpty());
     }
 
-    @Test
-    public void testPostTracking() throws Exception {
-        System.out.println("test POSTING...");
-        JsonObject result = afterShip.postTracking(tracking);
-        System.out.println(result);
-        Assert.assertEquals(result.getJsonObject("meta").getInt("code"), 201);
+    @After
+    public void testDeleteTracking() throws Exception {
+        JsonObject result = afterShip.deleteTracking(tracking);
+        assertEquals(result.getJsonObject("meta").getInt("code"), 200);
     }
 
     @AfterClass
-    public static void testDeleteTracking() throws Exception {
-        System.out.println("Après tout DELETING...");
-        JsonObject result = afterShip.deleteTracking(tracking);
-        System.out.println(result);
-        Assert.assertEquals(result.getJsonObject("meta").getInt("code"), 200);
+    public static void testGetJsonArray() throws Exception {
+        Tracking tracking = new Tracking();
+        tracking.setTrackingNumber("DJ030008833FR");
+        tracking.setCarrier("chronopost-france");
+        JsonArray result = afterShip.getJsonArray(tracking);
+        assertNull("Colis introuvable",result);
     }
 }

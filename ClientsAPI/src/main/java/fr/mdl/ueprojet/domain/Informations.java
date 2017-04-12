@@ -3,6 +3,7 @@ package fr.mdl.ueprojet.domain;
 /**
  * Created by Jakline on 07/02/2017.
  */
+
 public class Informations {
 
     private String date;
@@ -22,6 +23,7 @@ public class Informations {
     }
 
     public void setDate(String date) {
+        date = date.substring(0,10);
         this.date = date;
     }
 

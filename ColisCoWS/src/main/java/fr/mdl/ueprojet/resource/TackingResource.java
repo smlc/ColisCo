@@ -33,7 +33,7 @@ public class TackingResource {
     @GET
     @Path("tracking/{code}")
     @Produces("application/json")
-    public List<Tracking> getOneTracking(@PathParam("code") String code){
+    public Tracking getOneTracking(@PathParam("code") String code){
         return colisService.getOnlyTracking(code);
     }
 
@@ -45,7 +45,7 @@ public class TackingResource {
     @GET
     @Path("trackings")
     @Produces("application/json")
-    public List<List<Tracking>> getTrackingList(@QueryParam("code") List<String> codes){
+    public List<Tracking> getTrackingList(@QueryParam("code") List<String> codes){
         return colisService.getAllTracking(codes);
     }
 

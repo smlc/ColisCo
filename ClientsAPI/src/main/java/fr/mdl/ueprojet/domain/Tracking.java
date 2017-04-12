@@ -1,6 +1,8 @@
 package fr.mdl.ueprojet.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jakline on 30/01/2017.
@@ -9,14 +11,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Tracking {
     private String trackingNumber;
     private String carrier;
-    private Informations informations;
+    private List<Informations> informations;
 
-    public Tracking() {
-    }
+    public Tracking() {} // JAXB needs this
 
     public Tracking(String trackingNumber, String carrier) {
         this.trackingNumber = trackingNumber;
         this.carrier = carrier;
+        this.informations = new ArrayList<>();
     }
 
     public String getTrackingNumber() {
@@ -35,18 +37,22 @@ public class Tracking {
         this.carrier = carrier;
     }
 
-    public Informations getInformations() {
+    public List<Informations> getInformations() {
         return informations;
     }
-    public void setInformations(Informations informations) {
+
+    public void setInformations(List<Informations> informations) {
         this.informations = informations;
     }
 
-    public String toString(){
-        return "Numero de colis : " + trackingNumber
-                + "\nTransporteur : " + carrier
-                + "\nDate : " + informations.getDate()
-                + "\nMessage : " + informations.getMessage()
-                + "\nLocation : " + informations.getLocation() + "\n";
+    public String toString() {
+        String s = "";
+        s = "Numero de colis : " + trackingNumber + "\nTransporteur : " + carrier;
+        for (Informations information : informations) {
+            s += "\nDate : " + information.getDate()
+                    + "\nMessage : " + information.getMessage()
+                    + "\nLocation : " + information.getLocation() + "\n";
+        }
+        return s;
     }
 }

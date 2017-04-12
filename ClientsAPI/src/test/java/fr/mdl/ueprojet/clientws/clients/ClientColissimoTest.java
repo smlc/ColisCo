@@ -14,23 +14,12 @@ public class ClientColissimoTest {
 
     @Before
     public void setUp() throws Exception {
-        clientColissimo = new ClientColissimo();
-    }
-
-    @Test
-    public void testGetTracking() throws Exception {
-
+        clientColissimo = new ClientColissimo("8L00024797016");
     }
 
     @Test
     public void testIsFormat() throws Exception {
-        boolean resultat = clientColissimo.isFormat("8G42545222222");
-        assertEquals(resultat, true);
-        resultat = clientColissimo.isFormat("8L42545222222");
-        assertEquals(resultat, true);
-        resultat = clientColissimo.isFormat("0055425452222");
-        assertEquals(resultat, false);
-        resultat = clientColissimo.isFormat("8L5425452222");
-        assertEquals(resultat, false);
+        assertTrue(ClientColissimo.isFormat("8L00024797016"));
+        assertFalse(ClientColissimo.isFormat("8W0002479701"));
     }
 }

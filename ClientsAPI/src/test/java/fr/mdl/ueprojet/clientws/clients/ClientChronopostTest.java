@@ -14,16 +14,12 @@ public class ClientChronopostTest {
 
     @Before
     public void setUp() throws Exception {
-        clientChronopost = new ClientChronopost();
+        clientChronopost = new ClientChronopost("DJ030008833FR");
     }
 
     @Test
     public void testIsFormat() throws Exception {
-        Boolean resultat = clientChronopost.isFormat("8G426452222");
-        assertEquals(resultat, false);
-        resultat = clientChronopost.isFormat("8L425452222");
-        assertEquals(resultat, false);
-        resultat = clientChronopost.isFormat("DJ030008833FR");
-        assertEquals(resultat, true);
+        assertTrue(ClientChronopost.isFormat("DJ030008833FR"));
+        assertFalse(ClientChronopost.isFormat("DJ0004"));
     }
 }
